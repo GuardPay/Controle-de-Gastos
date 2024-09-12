@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardPay</title>
+    <style>
+        body {
+            background-color: #ff2f2f;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            text-align: center;
+            margin: 0;
+            overflow: hidden;
+            transition: background-color 0.2s;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+        }
+        img {
+            width: 80px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .button {
+            background-color: #ffffff;
+            color: #ff2f2f;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, color 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .button img {
+            width: 30px;
+            margin-right: 10px;
+        }
+        .button:hover {
+            background-color: #ff2f2f;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .hidden {
+            display: none;
+        }
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: transform 0.2s;
+        }
+        .settings-icon:hover {
+            transform: rotate(90deg);
+        }
+        .settings-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: #ffffff;
+            color: #ff2f2f;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            display: none;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .settings-menu div {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .settings-menu div:hover {
+            background-color: #ffcccc;
+        }
+        .note-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 47, 47, 0.9);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1001;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease-in-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        textarea {
+            width: 80%;
+            height: 200px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            resize: none;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 1.5em;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .close-button:hover {
+            transform: scale(1.1);
+        }
+        .theme-setup {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 47, 47, 0.9);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1002;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease-in-out;
+        }
+        .theme-options {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .theme-options button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            color: #ff2f2f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .theme-options button:hover {
+            background-color: #ff2f2f;
+            color: #ffffff;
+        }
+        .notification-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            z-index: 1003;
+        }
+        .notification {
+            background-color: #ffffff;
+            color: #ff2f2f;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://raw.githubusercontent.com/GuardPay/IMAGENS-/main/GuardPay.png" alt="GuardPay Logo">
+        <h1>GuardPay</h1>
+        <button class="button" id="btn-estatisticas">
+            <img src="https://cdn-icons-png.flaticon.com/128/1782/1782410.png" alt="Estatísticas">
+            Vê Estatísticas do Banco Inter
+        </button>
+        <button class="button" id="btn-historico">
+            <img src="https://cdn-icons-png.flaticon.com/128/1782/1782410.png" alt="Histórico">
+            Vê Históricos de Gastos
+        </button>
+        <button class="button" id="btn-planos">
+            <img src="https://cdn-icons-png.flaticon.com/128/1782/1782410.png" alt="Planos">
+            Vê Planos
+        </button>
+        <button class="button" id="btn-objetivos">
+            <img src="https://cdn-icons-png.flaticon.com/128/1782/1782410.png" alt="Objetivos">
+            Vê Objetivos
+        </button>
+        <button class="button" id="btn-caderno">
+            <img src="https://cdn-icons-png.flaticon.com/128/1782/1782410.png" alt="Caderno">
+            Caderno de Anotações
+        </button>
+        <div class="settings-icon" onclick="toggleSettingsMenu()">☰</div>
+        <div class="settings-menu" id="settingsMenu">
+            <div onclick="showThemeSetup()">Configurar Tema</div>
+        </div>
+    </div>
+
+    <div class="note-section" id="noteSection">
+        <button class="close-button" onclick="closeNoteSection()">✖</button>
+        <h2>Caderno de Anotações</h2>
+        <textarea id="noteArea" placeholder="Escreva suas anotações aqui..."></textarea>
+        <button onclick="saveNote()">Salvar Anotação</button>
+    </div>
+
+    <div class="theme-setup" id="themeSetup">
+        <button class="close-button" onclick="closeThemeSetup()">✖</button>
+        <h2>Configurar Tema</h2>
+        <div class="theme-options">
+            <button onclick="setTheme('light')">Claro</button>
+            <button onclick="setTheme('dark')">Escuro</button>
+            <button onclick="setTheme('semi-dark')">Semi-Escuro</button>
+            <button onclick="setTheme('extremely-dark')">Extremamente Escuro</button>
+            <button onclick="setTheme('orange')">Laranja</button>
+            <button onclick="setTheme('purple')">Roxo</button>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script>
+        const noteSection = document.getElementById('noteSection');
+        const noteArea = document.getElementById('noteArea');
+        const settingsMenu = document.getElementById('settingsMenu');
+        const themeSetup = document.getElementById('themeSetup');
+
+        document.getElementById('btn-caderno').addEventListener('click', () => {
+            noteSection.style.display = 'flex';
+        });
+
+        function closeNoteSection() {
+            noteSection.style.display = 'none';
+        }
+
+        function toggleSettingsMenu() {
+            settingsMenu.style.display = settingsMenu.style.display === 'none' || settingsMenu.style.display === '' ? 'block' : 'none';
+        }
+
+        function showThemeSetup() {
+            themeSetup.style.display = 'flex';
+            settingsMenu.style.display = 'none';
+        }
+
+        function closeThemeSetup() {
+            themeSetup.style.display = 'none';
+        }
+
+        function setTheme(theme) {
+            let color;
+            switch(theme) {
+                case 'light':
+                    color = '#ffffff';
+                    document.body.style.color = '#ff2f2f';
+                    break;
+                case 'dark':
+                    color = '#333333';
+                    document.body.style.color = '#ffffff';
+                    break;
+                case 'semi-dark':
+                    color = '#666666';
+                    document.body.style.color = '#ffffff';
+                    break;
+                case 'extremely-dark':
+                    color = '#000000';
+                    document.body.style.color = '#ffffff';
+                    break;
+                case 'orange':
+                    color = '#ff7f00';
+                    document.body.style.color = '#333333';
+                    break;
+                case 'purple':
+                    color = '#800080';
+                    document.body.style.color = '#ffffff';
+                    break;
+            }
+            document.body.style.backgroundColor = color;
+            localStorage.setItem('theme', theme);
+            addNotification(`Tema ${theme} selecionado.`);
+        }
+
+        function saveNote() {
+            localStorage.setItem('nota', noteArea.value);
+            addNotification('Anotação salva com sucesso!');
+        }
+
+        function addNotification(message) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerText = message;
+
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => container.removeChild(notification), 500);
+            }, 3000);
+        }
+
+        window.addEventListener('load', () => {
+            const savedNote = localStorage.getItem('nota');
+            if (savedNote) {
+                noteArea.value = savedNote;
+            }
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+            .then(function(registration) {
+                console.log('Service Worker registrado com sucesso:', registration);
+            })
+            .catch(function(error) {
+                console.log('Falha ao registrar o Service Worker:', error);
+            });
+        }
+    </script>
+</body>
+</html>
